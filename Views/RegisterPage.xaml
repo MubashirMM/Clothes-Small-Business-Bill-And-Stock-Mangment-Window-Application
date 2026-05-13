@@ -390,33 +390,14 @@
             </Grid>
         </ScrollViewer>
 
-        <!-- Loading Overlay -->
-        <Border Background="#CC1F2937" 
+        <!-- Simple Loading Overlay - Same as LoginPage -->
+        <Border Background="#CC000000" 
                 Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Border Background="White" 
-                        Padding="20,16" 
-                        CornerRadius="12"
-                        HorizontalAlignment="Center">
-                    <StackPanel>
-                        <Viewbox Width="28" Height="28">
-                            <Grid>
-                                <Ellipse Width="20" Height="20" Stroke="#E5E7EB" StrokeThickness="3"/>
-                                <Ellipse Width="20" Height="20" Stroke="#4ECDC4" StrokeThickness="3" 
-                                         StrokeDashArray="4,4">
-                                    <Ellipse.RenderTransform>
-                                        <RotateTransform x:Name="SpinnerRotate" CenterX="10" CenterY="10"/>
-                                    </Ellipse.RenderTransform>
-                                </Ellipse>
-                            </Grid>
-                        </Viewbox>
-                        <TextBlock Text="Creating account..." 
-                                   Foreground="#374151" 
-                                   FontSize="13" 
-                                   FontWeight="SemiBold"
-                                   Margin="0,10,0,0"/>
-                    </StackPanel>
-                </Border>
+                <TextBlock Text="Creating account..." 
+                           Foreground="White" 
+                           FontSize="14" 
+                           FontWeight="Bold"/>
             </StackPanel>
         </Border>
     </Grid>
