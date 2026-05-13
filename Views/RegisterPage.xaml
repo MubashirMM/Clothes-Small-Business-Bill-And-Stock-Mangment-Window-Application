@@ -6,195 +6,417 @@
       xmlns:local="clr-namespace:WpfApp2"
       mc:Ignorable="d"
       Title="Register"
-      d:DesignWidth="480" d:DesignHeight="600"
-      Width="480" Height="600">
+      d:DesignWidth="800" d:DesignHeight="600"
+      Background="#F0F2F5">
 
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+
+        <!-- Drop Shadow Effect -->
+        <DropShadowEffect x:Key="CardShadow" 
+                          BlurRadius="15" 
+                          ShadowDepth="2" 
+                          Opacity="0.15"
+                          Color="Black"/>
+
+        <DropShadowEffect x:Key="HeaderShadow" 
+                          BlurRadius="8" 
+                          ShadowDepth="1" 
+                          Opacity="0.1"
+                          Color="Black"/>
+
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#4ECDC4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3BA89F"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#B0BEC5"/>
+                    <Setter Property="Foreground" Value="#ECEFF1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="OutlineButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#4ECDC4"/>
+            <Setter Property="BorderBrush" Value="#4ECDC4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4ECDC4"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- TextBox Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,0,0,3"/>
+            <Setter Property="BorderBrush" Value="#D0D5DD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#4ECDC4"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,0,0,3"/>
+            <Setter Property="BorderBrush" Value="#D0D5DD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#4ECDC4"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Fixed ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="BorderBrush" Value="#D0D5DD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Grid.ColumnSpan="2"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Focusable="False"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="6">
+                                            <Grid>
+                                                <ContentPresenter x:Name="ContentPresenter"
+                                                                  HorizontalAlignment="Left"
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="10,0"
+                                                                  Content="{TemplateBinding Content}"/>
+                                                <Path x:Name="Arrow"
+                                                      Fill="#6B7280"
+                                                      HorizontalAlignment="Right"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,12,0"
+                                                      Data="M0,0 L4,4 L8,0 Z"/>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ContentPresenter"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              Margin="10,0"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
+                            <Popup x:Name="Popup"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Grid x:Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="White"
+                                            BorderBrush="#E5E7EB"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            Margin="0,2,0,0"
+                                            Effect="{StaticResource CardShadow}">
+                                        <ScrollViewer Margin="4,2"
+                                                      SnapsToDevicePixels="True"
+                                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                            <ItemsPresenter x:Name="ItemsPresenter"
+                                                            KeyboardNavigation.DirectionalNavigation="Contained"
+                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#9CA3AF"/>
+                                <Setter TargetName="ToggleButton" Property="Background" Value="#F3F4F6"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="True">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Label Style -->
+        <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
     </Page.Resources>
 
     <Grid>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#4ECDC4" Offset="0"/>
-                <GradientStop Color="#556270" Offset="1"/>
+                <GradientStop Color="#E8F4F8" Offset="0"/>
+                <GradientStop Color="#F0E6F6" Offset="0.5"/>
+                <GradientStop Color="#E8F4F8" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" Background="White" Opacity="0.95">
-            <TextBlock Text="Create New Account" 
-                       FontSize="22" 
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Foreground="#4ECDC4"/>
+        <!-- Header - Reduced Height -->
+        <Border Grid.Row="0" 
+                Background="White" 
+                Opacity="0.96"
+                BorderBrush="#E5E7EB"
+                BorderThickness="0,0,0,1"
+                Effect="{StaticResource HeaderShadow}">
+            <StackPanel VerticalAlignment="Center" Margin="30,0">
+                <TextBlock Text="Create New Account" 
+                           FontSize="22" 
+                           FontWeight="Bold"
+                           Foreground="#1F2937"/>
+                <TextBlock Text="Please fill in the details below to register" 
+                           FontSize="11" 
+                           Foreground="#6B7280"
+                           Margin="0,2,0,0"/>
+            </StackPanel>
         </Border>
 
-        <!-- Registration Form -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <Border Background="White"
-                    CornerRadius="15"
-                    Margin="30,15,30,25"
-                    Padding="25">
+        <!-- Registration Form - Reduced Height -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="480"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <StackPanel>
-                    <!-- Username Field -->
-                    <TextBlock Text="Username" 
-                               FontSize="13" 
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,5"/>
-                    <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                             FontSize="13"
-                             Padding="8"
-                             Margin="0,0,0,3"/>
-                    <TextBlock Text="{Binding FieldErrors[UserName]}" 
-                               Foreground="#D32F2F" 
-                               FontSize="10"
-                               Margin="5,0,0,10"
-                               Visibility="{Binding FieldErrors[UserName], Converter={StaticResource StringToVisibilityConverter}}"/>
+                <!-- Form Card -->
+                <Border Grid.Column="1"
+                        Background="White"
+                        CornerRadius="16"
+                        Margin="20,20"
+                        Padding="0"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        Effect="{StaticResource CardShadow}">
 
-                    <!-- Email Field -->
-                    <TextBlock Text="Email Address" 
-                               FontSize="13" 
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,5"/>
-                    <TextBox Text="{Binding UserEmail, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                             FontSize="13"
-                             Padding="8"
-                             Margin="0,0,0,3"/>
-                    <TextBlock Text="{Binding FieldErrors[UserEmail]}" 
-                               Foreground="#D32F2F" 
-                               FontSize="10"
-                               Margin="5,0,0,10"
-                               Visibility="{Binding FieldErrors[UserEmail], Converter={StaticResource StringToVisibilityConverter}}"/>
+                    <StackPanel Margin="28,24">
+                        <!-- Username Field -->
+                        <TextBlock Text="Username" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
+                        <TextBlock Text="{Binding FieldErrors[UserName]}" 
+                                   Foreground="#EF4444" 
+                                   FontSize="10"
+                                   Margin="8,2,0,8"
+                                   Visibility="{Binding FieldErrors[UserName], Converter={StaticResource StringToVisibilityConverter}}"/>
 
-                    <!-- Password Field -->
-                    <TextBlock Text="Password" 
-                               FontSize="13" 
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,5"/>
-                    <PasswordBox x:Name="PasswordBox"
-                                 FontSize="13"
-                                 Padding="8"
-                                 Margin="0,0,0,3"/>
-                    <TextBlock Text="{Binding FieldErrors[UserPassword]}" 
-                               Foreground="#D32F2F" 
-                               FontSize="10"
-                               Margin="5,0,0,10"
-                               Visibility="{Binding FieldErrors[UserPassword], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <!-- Email Field -->
+                        <TextBlock Text="Email Address" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding UserEmail, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
+                        <TextBlock Text="{Binding FieldErrors[UserEmail]}" 
+                                   Foreground="#EF4444" 
+                                   FontSize="10"
+                                   Margin="8,2,0,8"
+                                   Visibility="{Binding FieldErrors[UserEmail], Converter={StaticResource StringToVisibilityConverter}}"/>
 
-                    <!-- Confirm Password Field -->
-                    <TextBlock Text="Confirm Password" 
-                               FontSize="13" 
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,5"/>
-                    <PasswordBox x:Name="ConfirmPasswordBox"
-                                 FontSize="13"
-                                 Padding="8"
-                                 Margin="0,0,0,3"/>
-                    <TextBlock Text="{Binding FieldErrors[ConfirmPassword]}" 
-                               Foreground="#D32F2F" 
-                               FontSize="10"
-                               Margin="5,0,0,10"
-                               Visibility="{Binding FieldErrors[ConfirmPassword], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <!-- Password Field -->
+                        <TextBlock Text="Password" Style="{StaticResource FormLabelStyle}"/>
+                        <PasswordBox x:Name="PasswordBox"/>
+                        <TextBlock Text="{Binding FieldErrors[UserPassword]}" 
+                                   Foreground="#EF4444" 
+                                   FontSize="10"
+                                   Margin="8,2,0,8"
+                                   Visibility="{Binding FieldErrors[UserPassword], Converter={StaticResource StringToVisibilityConverter}}"/>
 
-                    <!-- Role Selection -->
-                    <TextBlock Text="User Role" 
-                               FontSize="13" 
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,5"/>
-                    <ComboBox ItemsSource="{Binding UserRoles}"
-                              SelectedItem="{Binding SelectedUserRole}"
-                              FontSize="13"
-                              Padding="8"
-                              Margin="0,0,0,15"/>
+                        <!-- Confirm Password Field -->
+                        <TextBlock Text="Confirm Password" Style="{StaticResource FormLabelStyle}"/>
+                        <PasswordBox x:Name="ConfirmPasswordBox"/>
+                        <TextBlock Text="{Binding FieldErrors[ConfirmPassword]}" 
+                                   Foreground="#EF4444" 
+                                   FontSize="10"
+                                   Margin="8,2,0,8"
+                                   Visibility="{Binding FieldErrors[ConfirmPassword], Converter={StaticResource StringToVisibilityConverter}}"/>
 
-                    <!-- Error Message -->
-                    <TextBlock Text="{Binding ErrorMessage}" 
-                               Foreground="#D32F2F" 
-                               FontSize="11"
-                               TextWrapping="Wrap"
-                               Margin="0,0,0,10"
-                               Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <!-- Role Selection -->
+                        <TextBlock Text="User Role" Style="{StaticResource FormLabelStyle}"/>
+                        <ComboBox ItemsSource="{Binding UserRoles}"
+                                  SelectedItem="{Binding SelectedUserRole}"/>
 
-                    <!-- Password Requirements -->
-                    <Border Background="#FFF9E6" 
-                            Padding="8" 
-                            Margin="0,0,0,15"
-                            CornerRadius="5">
-                        <TextBlock FontSize="10" 
-                                   Foreground="#856404"
-                                   TextWrapping="Wrap">
-                            <Run Text="🔒 Password requirements: "/>
-                            <Run Text="8-12 chars, 1 uppercase, 1 lowercase, 1 number, 1 special (@$!%*?&amp;)"/>
-                        </TextBlock>
-                    </Border>
+                        <!-- Password Requirements Info - Reduced Size -->
+                        <Border Background="#FEF3C7" 
+                                Padding="10" 
+                                Margin="0,0,0,12"
+                                CornerRadius="8">
+                            <StackPanel>
+                                <TextBlock FontSize="10" 
+                                           Foreground="#D97706"
+                                           FontWeight="SemiBold">
+                                    🔒 Password Requirements
+                                </TextBlock>
+                                <TextBlock FontSize="9" 
+                                           Foreground="#B45309"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0">
+                                    8-12 chars, 1 uppercase, 1 lowercase, 1 number, 1 special (@$!%*?&amp;)
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
 
-                    <!-- Register Button -->
-                    <Button Command="{Binding RegisterCommand}"
-                            Content="CREATE ACCOUNT"
-                            FontSize="14"
-                            FontWeight="Bold"
-                            Padding="10"
-                            Background="#4ECDC4"
-                            Foreground="White"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            Margin="0,0,0,10">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#4ECDC4"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#45B7B0"/>
-                                    </Trigger>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="#CCCCCC"/>
-                                        <Setter Property="Foreground" Value="#999999"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                        <!-- Error Message -->
+                        <TextBlock Text="{Binding ErrorMessage}" 
+                                   Foreground="#EF4444" 
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   Margin="0,0,0,10"
+                                   Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
 
-                    <!-- Back Button -->
-                    <Button Command="{Binding BackToHomeCommand}"
-                            Content="← Back to Home"
-                            FontSize="12"
-                            Padding="6"
-                            Background="Transparent"
-                            Foreground="#4ECDC4"
-                            BorderBrush="#4ECDC4"
-                            BorderThickness="1"
-                            Cursor="Hand"
-                            Margin="0,5,0,0">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#4ECDC4"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </StackPanel>
-            </Border>
+                        <!-- Register Button -->
+                        <Button Command="{Binding RegisterCommand}"
+                                Content="CREATE ACCOUNT"
+                                Style="{StaticResource ModernButtonStyle}"
+                                Height="42"
+                                Margin="0,0,0,10"/>
+
+                        <!-- Back Button -->
+                        <Button Command="{Binding BackToHomeCommand}"
+                                Content="← Back to Home"
+                                Style="{StaticResource OutlineButtonStyle}"
+                                Height="34"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </ScrollViewer>
 
         <!-- Loading Overlay -->
-        <Border Background="#CC000000" 
+        <Border Background="#CC1F2937" 
                 Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="Creating account..." Foreground="White" FontSize="16" FontWeight="Bold"/>
+                <Border Background="White" 
+                        Padding="20,16" 
+                        CornerRadius="12"
+                        HorizontalAlignment="Center">
+                    <StackPanel>
+                        <Viewbox Width="28" Height="28">
+                            <Grid>
+                                <Ellipse Width="20" Height="20" Stroke="#E5E7EB" StrokeThickness="3"/>
+                                <Ellipse Width="20" Height="20" Stroke="#4ECDC4" StrokeThickness="3" 
+                                         StrokeDashArray="4,4">
+                                    <Ellipse.RenderTransform>
+                                        <RotateTransform x:Name="SpinnerRotate" CenterX="10" CenterY="10"/>
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
+                            </Grid>
+                        </Viewbox>
+                        <TextBlock Text="Creating account..." 
+                                   Foreground="#374151" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold"
+                                   Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </Border>
     </Grid>

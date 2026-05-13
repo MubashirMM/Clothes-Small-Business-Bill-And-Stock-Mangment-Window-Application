@@ -1,13 +1,136 @@
 ﻿<Page
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="WpfApp2.Views.HomePage"
-      Title="HomePage" d:DesignWidth="419" d:DesignHeight="241.8">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d" 
+    x:Class="WpfApp2.Views.HomePage"
+    Title="HomePage" 
+    d:DesignWidth="800" 
+    d:DesignHeight="600"
+    Background="#F5F5F5">
 
     <Grid>
-        <Button Content="Register" Command="{Binding RegisterCommand}" 
-                HorizontalAlignment="Center" Margin="0,110,0,110" Height="22" Width="132"/>
-        <Button Content="Login" Command="{Binding LoginCommand}" 
-                HorizontalAlignment="Center" Margin="0,150,0,70" Height="22" Width="132"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header / Hero Section with Store Name and Welcome Message -->
+        <Border Grid.Row="0" Background="#2C3E50" Padding="20">
+            <StackPanel HorizontalAlignment="Center" TextBlock.Foreground="White">
+                <TextBlock Text="👕 FASHION HUB" 
+                           FontSize="32" 
+                           FontWeight="Bold" 
+                           HorizontalAlignment="Center"
+                           FontFamily="Segoe UI"/>
+                <TextBlock Text="Your Style, Our Passion" 
+                           FontSize="16" 
+                           HorizontalAlignment="Center"
+                           Margin="0,8,0,0"
+                           Opacity="0.9"/>
+                <TextBlock Text="Welcome to Fashion Hub - Discover the latest trends in clothing!" 
+                           FontSize="14" 
+                           HorizontalAlignment="Center"
+                           Margin="0,15,0,0"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content: Buttons Section (Responsive) -->
+        <Grid Grid.Row="1" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="1" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                        Margin="20">
+                <!-- Register Button -->
+                <Button Command="{Binding RegisterCommand}" 
+                        Content="📝 REGISTER"
+                        Width="160"
+                        Height="50"
+                        Margin="15"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Background="#3498DB"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#2980B9"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- Login Button -->
+                <Button Command="{Binding LoginCommand}" 
+                        Content="🔐 LOGIN"
+                        Width="160"
+                        Height="50"
+                        Margin="15"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Background="#2ECC71"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#27AE60"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Footer Section -->
+        <Border Grid.Row="2" Background="#34495E" Padding="12">
+            <TextBlock Text="© 2025 Fashion Hub. All Rights Reserved." 
+                       HorizontalAlignment="Center"
+                       Foreground="#BDC3C7"
+                       FontSize="12"
+                       FontFamily="Segoe UI"/>
+        </Border>
     </Grid>
 </Page>
