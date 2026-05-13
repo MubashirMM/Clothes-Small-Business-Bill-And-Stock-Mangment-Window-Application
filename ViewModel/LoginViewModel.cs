@@ -94,6 +94,17 @@ namespace WpfApp2.ViewModel
             {
                 using (var db = new DatabaseContext())
                 {
+                    // First check if email exists
+                    bool emailExists = await db.IsEmailExists(UserEmail);
+
+                    if (!emailExists)
+                    {
+                        ErrorMessage = "Invalid email";
+                        IsLoading = false;
+                        return;
+                    }
+
+                    // If email exists, check credentials
                     var user = await db.GetUserByCredentials(UserEmail, UserPassword);
 
                     if (user != null)
@@ -120,27 +131,25 @@ namespace WpfApp2.ViewModel
 
                         MessageBox.Show($"Welcome {user.UserName}!\n\nAccess Token expires in 15 minutes\nRefresh Token expires in 7 days",
                                       "Login Success (JWT)", MessageBoxButton.OK, MessageBoxImage.Information);
+
                         switch (user.UserRole)
                         {
                             case UserRole.SuperAdminUser:
-                                MessageBox.Show($"Welcome Super Admin {user.UserName}!", "Login Success", MessageBoxButton.OK, MessageBoxImage.Information);
                                 _ns.Navigate(new SuperAdminPage(_ns));
                                 break;
 
                             case UserRole.Admin:
-                                MessageBox.Show($"Welcome Admin {user.UserName}!", "Login Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                                _ns.Navigate(new AdminPage(_ns)); // Navigate to AdminPage
+                                _ns.Navigate(new AdminPage(_ns));
                                 break;
 
                             case UserRole.User:
-                                MessageBox.Show($"Welcome User {user.UserName}!", "Login Success", MessageBoxButton.OK, MessageBoxImage.Information);
                                 _ns.Navigate(new UserPage(_ns, user.UserId));
                                 break;
                         }
                     }
                     else
                     {
-                        ErrorMessage = "Invalid email or password. Please try again.";
+                        ErrorMessage = "Invalid password";
                     }
                 }
             }
@@ -153,7 +162,6 @@ namespace WpfApp2.ViewModel
                 IsLoading = false;
             }
         }
-
         private void BackToHome()
         {
             _ns.Navigate(new HomePage(_ns));

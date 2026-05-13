@@ -21,6 +21,7 @@ namespace WpfApp2.ViewModel
         private ClothingProduct _selectedProduct;
         private string _searchText;
         private string _errorMessage;
+        private string _validationError;
         private bool _isLoading;
         private bool _isEditMode;
 
@@ -35,6 +36,12 @@ namespace WpfApp2.ViewModel
         private string _price;
         private string _stockQuantity;
 
+        // Default values for dropdowns
+        private const string DEFAULT_SIZE = "M";
+        private const string DEFAULT_GENDER = "Male";
+        private const string DEFAULT_SEASON = "Summer";
+
+        // Commands
         public ICommand SaveProductCommand { get; private set; }
         public ICommand UpdateProductCommand { get; private set; }
         public ICommand DeleteProductCommand { get; private set; }
@@ -42,7 +49,10 @@ namespace WpfApp2.ViewModel
         public ICommand SearchCommand { get; private set; }
         public ICommand LoadProductsCommand { get; private set; }
         public ICommand BackToHomeCommand { get; private set; }
+        public ICommand EditProductCommand { get; private set; }
+        public ICommand DeleteProductDirectCommand { get; private set; }
 
+        // Properties
         public ObservableCollection<ClothingProduct> Products
         {
             get => _products;
@@ -75,7 +85,6 @@ namespace WpfApp2.ViewModel
             {
                 _searchText = value;
                 OnPropertyChanged();
-                // Don't auto-execute - let user click search button
             }
         }
 
@@ -85,6 +94,16 @@ namespace WpfApp2.ViewModel
             set
             {
                 _errorMessage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string ValidationError
+        {
+            get => _validationError;
+            set
+            {
+                _validationError = value;
                 OnPropertyChanged();
             }
         }
@@ -122,6 +141,7 @@ namespace WpfApp2.ViewModel
             {
                 _productName = value;
                 OnPropertyChanged();
+                ValidateForm();
                 ((RelayCommand)SaveProductCommand)?.RaiseCanExecuteChanged();
                 ((RelayCommand)UpdateProductCommand)?.RaiseCanExecuteChanged();
             }
@@ -194,6 +214,7 @@ namespace WpfApp2.ViewModel
             {
                 _price = value;
                 OnPropertyChanged();
+                ValidateForm();
                 ((RelayCommand)SaveProductCommand)?.RaiseCanExecuteChanged();
                 ((RelayCommand)UpdateProductCommand)?.RaiseCanExecuteChanged();
             }
@@ -224,11 +245,7 @@ namespace WpfApp2.ViewModel
             SeasonList = new List<string> { "Summer", "Winter", "Spring", "Fall", "All Season" };
             SizeList = new List<string> { "XS", "S", "M", "L", "XL", "XXL" };
 
-            // Initialize with default values
-            _price = "0";
-            _stockQuantity = "0";
-
-            // Initialize commands FIRST
+            // Initialize commands
             SaveProductCommand = new RelayCommand(SaveProduct, CanSaveProduct);
             UpdateProductCommand = new RelayCommand(UpdateProduct, CanUpdateProduct);
             DeleteProductCommand = new RelayCommand(DeleteProduct, CanDeleteProduct);
@@ -236,30 +253,53 @@ namespace WpfApp2.ViewModel
             SearchCommand = new RelayCommand(SearchProducts);
             LoadProductsCommand = new RelayCommand(async () => await LoadProducts());
             BackToHomeCommand = new RelayCommand(BackToHome);
+            EditProductCommand = new RelayCommand<ClothingProduct>(EditProduct);
+            DeleteProductDirectCommand = new RelayCommand<ClothingProduct>(DeleteProductDirect);
+
+            // Reset form to default empty state
+            ResetFormToDefault();
 
             // Load products
             LoadProducts();
         }
 
+        private void ValidateForm()
+        {
+            if (string.IsNullOrWhiteSpace(ProductName))
+            {
+                ValidationError = "Product Name is required";
+            }
+            else if (string.IsNullOrWhiteSpace(Price) || !decimal.TryParse(Price, out decimal price) || price <= 0)
+            {
+                ValidationError = "Please enter a valid price greater than 0";
+            }
+            else
+            {
+                ValidationError = string.Empty;
+            }
+        }
+
         private bool CanSaveProduct()
         {
             bool hasName = !string.IsNullOrWhiteSpace(ProductName);
-            bool hasPrice = !string.IsNullOrWhiteSpace(Price) && decimal.TryParse(Price, out decimal priceValue) && priceValue > 0;
+            bool hasValidPrice = !string.IsNullOrWhiteSpace(Price) && decimal.TryParse(Price, out decimal priceValue) && priceValue > 0;
             bool notInEditMode = !IsEditMode;
             bool notLoading = !IsLoading;
+            bool noValidationError = string.IsNullOrWhiteSpace(ValidationError);
 
-            return hasName && hasPrice && notInEditMode && notLoading;
+            return hasName && hasValidPrice && notInEditMode && notLoading && noValidationError;
         }
 
         private bool CanUpdateProduct()
         {
             bool hasName = !string.IsNullOrWhiteSpace(ProductName);
-            bool hasPrice = !string.IsNullOrWhiteSpace(Price) && decimal.TryParse(Price, out decimal priceValue) && priceValue > 0;
+            bool hasValidPrice = !string.IsNullOrWhiteSpace(Price) && decimal.TryParse(Price, out decimal priceValue) && priceValue > 0;
             bool inEditMode = IsEditMode;
             bool hasSelected = SelectedProduct != null;
             bool notLoading = !IsLoading;
+            bool noValidationError = string.IsNullOrWhiteSpace(ValidationError);
 
-            return hasName && hasPrice && inEditMode && hasSelected && notLoading;
+            return hasName && hasValidPrice && inEditMode && hasSelected && notLoading && noValidationError;
         }
 
         private bool CanDeleteProduct()
@@ -267,20 +307,42 @@ namespace WpfApp2.ViewModel
             return SelectedProduct != null && !IsLoading;
         }
 
+        private void ResetFormToDefault()
+        {
+            ProductName = string.Empty;
+            Brand = string.Empty;
+            Color = string.Empty;
+            Material = string.Empty;
+            Price = "0";
+            StockQuantity = "0";
+
+            // Set dropdowns to default values
+            Size = DEFAULT_SIZE;
+            Gender = DEFAULT_GENDER;
+            Season = DEFAULT_SEASON;
+        }
+
         private async void SaveProduct()
         {
+            // Validate before saving
+            if (string.IsNullOrWhiteSpace(ProductName))
+            {
+                ValidationError = "Product Name is required";
+                return;
+            }
+
+            if (!decimal.TryParse(Price, out decimal priceValue) || priceValue <= 0)
+            {
+                ValidationError = "Please enter a valid price greater than 0";
+                return;
+            }
+
             IsLoading = true;
             ErrorMessage = string.Empty;
+            ValidationError = string.Empty;
 
             try
             {
-                if (!decimal.TryParse(Price, out decimal priceValue))
-                {
-                    ErrorMessage = "Please enter a valid price";
-                    IsLoading = false;
-                    return;
-                }
-
                 if (!int.TryParse(StockQuantity, out int stockValue))
                 {
                     stockValue = 0;
@@ -288,7 +350,7 @@ namespace WpfApp2.ViewModel
 
                 var product = new ClothingProduct
                 {
-                    Name = ProductName,
+                    Name = ProductName.Trim(),
                     Size = Size ?? string.Empty,
                     Color = Color ?? string.Empty,
                     Material = Material ?? string.Empty,
@@ -306,7 +368,7 @@ namespace WpfApp2.ViewModel
                     if (success)
                     {
                         MessageBox.Show("Product added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                        ClearForm();
+                        ResetFormToDefault();
                         await LoadProducts();
                     }
                     else
@@ -327,30 +389,37 @@ namespace WpfApp2.ViewModel
 
         private async void UpdateProduct()
         {
+            // Validate before updating
+            if (string.IsNullOrWhiteSpace(ProductName))
+            {
+                ValidationError = "Product Name is required";
+                return;
+            }
+
+            if (!decimal.TryParse(Price, out decimal priceValue) || priceValue <= 0)
+            {
+                ValidationError = "Please enter a valid price greater than 0";
+                return;
+            }
+
             IsLoading = true;
             ErrorMessage = string.Empty;
+            ValidationError = string.Empty;
 
             try
             {
-                if (!decimal.TryParse(Price, out decimal priceValue))
-                {
-                    ErrorMessage = "Please enter a valid price";
-                    IsLoading = false;
-                    return;
-                }
-
                 if (!int.TryParse(StockQuantity, out int stockValue))
                 {
                     stockValue = 0;
                 }
 
-                SelectedProduct.Name = ProductName;
-                SelectedProduct.Size = Size;
-                SelectedProduct.Color = Color;
-                SelectedProduct.Material = Material;
-                SelectedProduct.Brand = Brand;
-                SelectedProduct.Gender = Gender;
-                SelectedProduct.Season = Season;
+                SelectedProduct.Name = ProductName.Trim();
+                SelectedProduct.Size = Size ?? string.Empty;
+                SelectedProduct.Color = Color ?? string.Empty;
+                SelectedProduct.Material = Material ?? string.Empty;
+                SelectedProduct.Brand = Brand ?? string.Empty;
+                SelectedProduct.Gender = Gender ?? string.Empty;
+                SelectedProduct.Season = Season ?? string.Empty;
                 SelectedProduct.Price = priceValue;
                 SelectedProduct.StockQuantity = stockValue;
 
@@ -361,7 +430,7 @@ namespace WpfApp2.ViewModel
                     if (success)
                     {
                         MessageBox.Show("Product updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                        ClearForm();
+                        ResetFormToDefault();
                         await LoadProducts();
                     }
                     else
@@ -382,6 +451,8 @@ namespace WpfApp2.ViewModel
 
         private async void DeleteProduct()
         {
+            if (SelectedProduct == null) return;
+
             var result = MessageBox.Show($"Are you sure you want to delete '{SelectedProduct.Name}'?",
                                         "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
@@ -400,7 +471,7 @@ namespace WpfApp2.ViewModel
                     if (success)
                     {
                         MessageBox.Show("Product deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                        ClearForm();
+                        ResetFormToDefault();
                         await LoadProducts();
                     }
                     else
@@ -418,11 +489,22 @@ namespace WpfApp2.ViewModel
                 IsLoading = false;
             }
         }
-        // Add this public method for direct delete from button
-        
-        
-        public async void DeleteProductDirect(ClothingProduct product)
+
+        private void EditProduct(ClothingProduct product)
         {
+            if (product != null)
+            {
+                LoadProductToForm(product);
+                IsEditMode = true;
+                SelectedProduct = product;
+                ValidationError = string.Empty;
+            }
+        }
+
+        private async void DeleteProductDirect(ClothingProduct product)
+        {
+            if (product == null) return;
+
             var result = MessageBox.Show($"Are you sure you want to delete '{product.Name}'?",
                                         "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
@@ -441,7 +523,7 @@ namespace WpfApp2.ViewModel
                     if (success)
                     {
                         MessageBox.Show("Product deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                        ClearForm();
+                        ResetFormToDefault();
                         await LoadProducts();
                     }
                     else
@@ -459,6 +541,7 @@ namespace WpfApp2.ViewModel
                 IsLoading = false;
             }
         }
+
         private async void SearchProducts()
         {
             if (string.IsNullOrWhiteSpace(SearchText))
@@ -515,34 +598,26 @@ namespace WpfApp2.ViewModel
             }
         }
 
-        // Change this method from private to public
         public void LoadProductToForm(ClothingProduct product)
         {
             ProductName = product.Name;
-            Size = product.Size;
-            Color = product.Color;
-            Material = product.Material;
-            Brand = product.Brand;
-            Gender = product.Gender;
-            Season = product.Season;
+            Size = string.IsNullOrEmpty(product.Size) ? DEFAULT_SIZE : product.Size;
+            Color = product.Color ?? string.Empty;
+            Material = product.Material ?? string.Empty;
+            Brand = product.Brand ?? string.Empty;
+            Gender = string.IsNullOrEmpty(product.Gender) ? DEFAULT_GENDER : product.Gender;
+            Season = string.IsNullOrEmpty(product.Season) ? DEFAULT_SEASON : product.Season;
             Price = product.Price.ToString();
             StockQuantity = product.StockQuantity.ToString();
         }
 
         private void ClearForm()
         {
-            ProductName = string.Empty;
-            Size = string.Empty;
-            Color = string.Empty;
-            Material = string.Empty;
-            Brand = string.Empty;
-            Gender = string.Empty;
-            Season = string.Empty;
-            Price = "0";
-            StockQuantity = "0";
+            ResetFormToDefault();
             SelectedProduct = null;
             IsEditMode = false;
             ErrorMessage = string.Empty;
+            ValidationError = string.Empty;
         }
 
         private void BackToHome()
