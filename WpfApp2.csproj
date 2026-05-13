@@ -141,6 +141,15 @@
     <Compile Include="InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Helper\TokenStorage.cs" />
     <Compile Include="Helper\TokenManager.cs" />
+    <Compile Include="Migrations\202605031852430_InitialCreate.cs" />
+    <Compile Include="Migrations\202605031852430_InitialCreate.Designer.cs">
+      <DependentUpon>202605031852430_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202605131248382_dbchanges.cs" />
+    <Compile Include="Migrations\202605131248382_dbchanges.Designer.cs">
+      <DependentUpon>202605131248382_dbchanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\Order.cs" />
     <Compile Include="Model\OrderItem.cs" />
     <Compile Include="Model\ClothingProduct.cs" />
@@ -224,6 +233,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Migrations\202605031852430_InitialCreate.resx">
+      <DependentUpon>202605031852430_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605131248382_dbchanges.resx">
+      <DependentUpon>202605131248382_dbchanges.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

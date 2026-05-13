@@ -161,7 +161,18 @@ namespace WpfApp2.DAL
                 return false;
             }
         }
-
+        public async Task<Users> GetUserById(int userId)
+        {
+            try
+            {
+                return await Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetUserById error: {ex.Message}");
+                return null;
+            }
+        }
         public async Task<List<Order>> GetUserOrders(int userId)
         {
             return await Orders
@@ -178,5 +189,6 @@ namespace WpfApp2.DAL
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
+
     }
 }

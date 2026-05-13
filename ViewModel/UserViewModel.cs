@@ -18,8 +18,19 @@ using QuestPDF.Infrastructure;
 
 namespace WpfApp2.ViewModel
 {
+   
     public class UserViewModel : INotifyPropertyChanged
     {
+        private string _customerName;
+        public string CustomerName
+        {
+            get => _customerName;
+            set
+            {
+                _customerName = value;
+                OnPropertyChanged();
+            }
+        }
         private readonly NavigationService _ns;
         private readonly int _currentUserId;
         private ObservableCollection<ClothingProduct> _products;
@@ -158,6 +169,29 @@ namespace WpfApp2.ViewModel
             BackToHomeCommand = new RelayCommand(BackToHome);
 
             LoadProducts();
+            LoadCustomerName();
+        }
+        private async void LoadCustomerName()
+        {
+            try
+            {
+                using (var db = new DatabaseContext())
+                {
+                    var user = await db.GetUserById(_currentUserId);
+                    if (user != null)
+                    {
+                        CustomerName = user.UserName;
+                    }
+                    else
+                    {
+                        CustomerName = "Customer";
+                    }
+                }
+            }
+            catch
+            {
+                CustomerName = "Customer";
+            }
         }
 
         private async Task LoadProducts()
@@ -177,7 +211,7 @@ namespace WpfApp2.ViewModel
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Load error: {ex.Message}";
+                ErrorMessage = $"Load error: {ex.Message}"; 
             }
             finally
             {
@@ -392,7 +426,7 @@ namespace WpfApp2.ViewModel
                 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string fileName = $"Invoice_{order.OrderId}_{order.OrderDate:yyyyMMdd_HHmmss}.pdf";
+                string fileName = $"Bill_{order.OrderId}_{order.OrderDate:yyyyMMdd_HHmmss}.pdf";
                 string filePath = Path.Combine(desktopPath, fileName);
 
                 QuestPDF.Fluent.Document.Create(container =>
@@ -405,62 +439,101 @@ namespace WpfApp2.ViewModel
                         page.DefaultTextStyle(x => x.FontSize(11));
 
                         page.Header()
-                            .Text("INVOICE")
-                            .SemiBold().FontSize(20).FontColor(QuestPDF.Helpers.Colors.Blue.Medium)
-                            .AlignCenter();
+                            .Column(header =>
+                            {
+                                header.Spacing(5);
+
+                                header.Item().Text("BILL")
+                                    .SemiBold().FontSize(24).FontColor(QuestPDF.Helpers.Colors.Green.Darken2)
+                                    .AlignCenter();
+
+                                header.Item().Text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                                    .AlignCenter();
+                            });
 
                         page.Content()
                             .PaddingVertical(1, Unit.Centimetre)
                             .Column(column =>
                             {
-                                column.Spacing(10);
+                                column.Spacing(8);
 
-                                column.Item().Text($"Order ID: {order.OrderId}").Bold();
-                                column.Item().Text($"Order Date: {order.OrderDate:MMM dd, yyyy hh:mm tt}");
-                                column.Item().Text($"Total Amount: ${order.TotalAmount:F2}");
+                                // Customer Information
+                                column.Item().Border(1).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten2).Padding(10).Column(info =>
+                                {
+                                    info.Spacing(5);
+                                    info.Item().Text("CUSTOMER INFORMATION").Bold().FontSize(12);
+                                    info.Item().Text($"Customer Name: {CustomerName}");
+                                    info.Item().Text($"Order Date: {order.OrderDate:MMM dd, yyyy hh:mm tt}");
+                                    info.Item().Text($"Bill ID: #{order.OrderId}");
+                                });
 
-                                column.Item().Text("Items:").Bold();
+                                // Bill Items Table
+                                column.Item().Text("BILL ITEMS").Bold().FontSize(12);
 
                                 column.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
                                     {
-                                        columns.ConstantColumn(50);
+                                        columns.ConstantColumn(40);
                                         columns.RelativeColumn(2);
-                                        columns.RelativeColumn(1);
-                                        columns.RelativeColumn(1);
-                                        columns.RelativeColumn(1);
+                                        columns.ConstantColumn(60);
+                                        columns.ConstantColumn(80);
+                                        columns.ConstantColumn(100);
                                     });
 
                                     table.Header(header =>
                                     {
-                                        header.Cell().Text("#");
-                                        header.Cell().Text("Product");
-                                        header.Cell().Text("Qty");
-                                        header.Cell().Text("Price");
-                                        header.Cell().Text("Total");
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("#").Bold();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Product").Bold();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Qty").Bold().AlignCenter();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Unit Price").Bold().AlignRight();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Total").Bold().AlignRight();
                                     });
 
                                     int index = 1;
                                     foreach (var item in order.OrderItems)
                                     {
-                                        table.Cell().Text(index.ToString());
-                                        table.Cell().Text(item.ProductName);
-                                        table.Cell().Text(item.Quantity.ToString());
-                                        table.Cell().Text($"${item.UnitPrice:F2}");
-                                        table.Cell().Text($"${item.TotalPrice:F2}");
+                                        table.Cell().Padding(5).Text(index.ToString());
+                                        table.Cell().Padding(5).Text(item.ProductName);
+                                        table.Cell().Padding(5).Text(item.Quantity.ToString()).AlignCenter();
+                                        table.Cell().Padding(5).Text($"${item.UnitPrice:F2}").AlignRight();
+                                        table.Cell().Padding(5).Text($"${item.TotalPrice:F2}").AlignRight();
                                         index++;
                                     }
+                                });
+
+                                // Total Section
+                                column.Item().AlignRight().Column(total =>
+                                {
+                                    total.Spacing(3);
+                                    total.Item().BorderBottom(1).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten2).Width(200);
+                                    total.Item().Row(row =>
+                                    {
+                                        row.RelativeItem().Text("Subtotal:").Bold();
+                                        row.RelativeItem().Text($"${order.TotalAmount:F2}").AlignRight();
+                                    });
+                                    total.Item().Row(row =>
+                                    {
+                                        row.RelativeItem().Text("Tax (0%):").Bold();
+                                        row.RelativeItem().Text("$0.00").AlignRight();
+                                    });
+                                    total.Item().Row(row =>
+                                    {
+                                        row.RelativeItem().Text("GRAND TOTAL:").Bold().FontSize(14);
+                                        row.RelativeItem().Text($"${order.TotalAmount:F2}").Bold().FontSize(14).AlignRight();
+                                    });
                                 });
                             });
 
                         page.Footer()
                             .AlignCenter()
-                            .Text(x =>
+                            .Column(footer =>
                             {
-                                x.Span("Thank you for your purchase!");
-                                x.Span(" - ");
-                                x.Span("Generated by WPF App");
+                                footer.Spacing(3);
+                                footer.Item().Text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                                footer.Item().Text("Thank you for shopping with us!");
+                                footer.Item().Text($"Generated on: {DateTime.Now:MMM dd, yyyy hh:mm tt}");
+                                footer.Item().Text("FASHION HUB - Your Style, Our Passion");
                             });
                     });
                 }).GeneratePdf(filePath);
@@ -472,8 +545,7 @@ namespace WpfApp2.ViewModel
             {
                 MessageBox.Show($"PDF generation error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
+        } 
         private void ViewPDF(Order order)
         {
             if (order == null) return;
@@ -506,7 +578,7 @@ namespace WpfApp2.ViewModel
                 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string fileName = $"Invoice_{order.OrderId}_{order.OrderDate:yyyyMMdd_HHmmss}.pdf";
+                string fileName = $"Bill_{order.OrderId}_{order.OrderDate:yyyyMMdd_HHmmss}.pdf";
                 string filePath = Path.Combine(desktopPath, fileName);
 
                 QuestPDF.Fluent.Document.Create(container =>
@@ -519,74 +591,102 @@ namespace WpfApp2.ViewModel
                         page.DefaultTextStyle(x => x.FontSize(11));
 
                         page.Header()
-                            .Text("INVOICE")
-                            .SemiBold().FontSize(20).FontColor(QuestPDF.Helpers.Colors.Blue.Medium)
-                            .AlignCenter();
+                            .Column(header =>
+                            {
+                                header.Spacing(5);
+                                header.Item().Text("BILL")
+                                    .SemiBold().FontSize(24).FontColor(QuestPDF.Helpers.Colors.Green.Darken2)
+                                    .AlignCenter();
+                                header.Item().Text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                                    .AlignCenter();
+                            });
 
                         page.Content()
                             .PaddingVertical(1, Unit.Centimetre)
                             .Column(column =>
                             {
-                                column.Spacing(10);
+                                column.Spacing(8);
 
-                                column.Item().Text($"Order ID: {order.OrderId}").Bold();
-                                column.Item().Text($"Order Date: {order.OrderDate:MMM dd, yyyy hh:mm tt}");
-                                column.Item().Text($"Total Amount: ${order.TotalAmount:F2}");
+                                column.Item().Border(1).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten2).Padding(10).Column(info =>
+                                {
+                                    info.Spacing(5);
+                                    info.Item().Text("CUSTOMER INFORMATION").Bold().FontSize(12);
+                                    info.Item().Text($"Customer Name: {CustomerName}");
+                                    info.Item().Text($"Order Date: {order.OrderDate:MMM dd, yyyy hh:mm tt}");
+                                    info.Item().Text($"Bill ID: #{order.OrderId}");
+                                });
 
-                                column.Item().Text("Items:").Bold();
+                                column.Item().Text("BILL ITEMS").Bold().FontSize(12);
 
                                 column.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
                                     {
-                                        columns.ConstantColumn(50);
+                                        columns.ConstantColumn(40);
                                         columns.RelativeColumn(2);
-                                        columns.RelativeColumn(1);
-                                        columns.RelativeColumn(1);
-                                        columns.RelativeColumn(1);
+                                        columns.ConstantColumn(60);
+                                        columns.ConstantColumn(80);
+                                        columns.ConstantColumn(100);
                                     });
 
                                     table.Header(header =>
                                     {
-                                        header.Cell().Text("#");
-                                        header.Cell().Text("Product");
-                                        header.Cell().Text("Qty");
-                                        header.Cell().Text("Price");
-                                        header.Cell().Text("Total");
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("#").Bold();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Product").Bold();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Qty").Bold().AlignCenter();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Unit Price").Bold().AlignRight();
+                                        header.Cell().Background(QuestPDF.Helpers.Colors.Grey.Lighten3).Padding(5).Text("Total").Bold().AlignRight();
                                     });
 
                                     int index = 1;
                                     foreach (var item in order.OrderItems)
                                     {
-                                        table.Cell().Text(index.ToString());
-                                        table.Cell().Text(item.ProductName);
-                                        table.Cell().Text(item.Quantity.ToString());
-                                        table.Cell().Text($"${item.UnitPrice:F2}");
-                                        table.Cell().Text($"${item.TotalPrice:F2}");
+                                        table.Cell().Padding(5).Text(index.ToString());
+                                        table.Cell().Padding(5).Text(item.ProductName);
+                                        table.Cell().Padding(5).Text(item.Quantity.ToString()).AlignCenter();
+                                        table.Cell().Padding(5).Text($"${item.UnitPrice:F2}").AlignRight();
+                                        table.Cell().Padding(5).Text($"${item.TotalPrice:F2}").AlignRight();
                                         index++;
                                     }
+                                });
+
+                                column.Item().AlignRight().Column(total =>
+                                {
+                                    total.Spacing(3);
+                                    total.Item().BorderBottom(1).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten2).Width(200);
+                                    total.Item().Row(row =>
+                                    {
+                                        row.RelativeItem().Text("Subtotal:").Bold();
+                                        row.RelativeItem().Text($"${order.TotalAmount:F2}").AlignRight();
+                                    });
+                                    total.Item().Row(row =>
+                                    {
+                                        row.RelativeItem().Text("GRAND TOTAL:").Bold().FontSize(14);
+                                        row.RelativeItem().Text($"${order.TotalAmount:F2}").Bold().FontSize(14).AlignRight();
+                                    });
                                 });
                             });
 
                         page.Footer()
                             .AlignCenter()
-                            .Text(x =>
+                            .Column(footer =>
                             {
-                                x.Span("Thank you for your purchase!");
-                                x.Span(" - ");
-                                x.Span("Generated by WPF App");
+                                footer.Spacing(3);
+                                footer.Item().Text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                                footer.Item().Text("Thank you for shopping with us!");
+                                footer.Item().Text($"Generated on: {DateTime.Now:MMM dd, yyyy hh:mm tt}");
+                                footer.Item().Text("FASHION HUB - Your Style, Our Passion");
                             });
                     });
                 }).GeneratePdf(filePath);
 
                 Process.Start(filePath);
-                MessageBox.Show($"PDF regenerated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"PDF regeneration error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
+        } 
 
         private async void LoadOrderHistory()
         {

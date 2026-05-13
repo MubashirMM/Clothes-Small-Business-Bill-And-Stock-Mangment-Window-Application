@@ -140,22 +140,22 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ProductId}" Width="50"/>
                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="180"/>
-                                <DataGridTextColumn Header="Brand" Binding="{Binding Brand}" Width="120"/>
-                                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="70"/>
-                                <DataGridTextColumn Header="Color" Binding="{Binding Color}" Width="90"/>
-                                <DataGridTextColumn Header="Gender" Binding="{Binding Gender}" Width="90"/>
-                                <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat={}{0:C2}}" Width="100"/>
-                                <DataGridTextColumn Header="Stock" Binding="{Binding StockQuantity}" Width="80"/>
+                                <DataGridTextColumn Header="Brand" Binding="{Binding Brand}" Width="100"/>
+                                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="60"/>
+                                <DataGridTextColumn Header="Color" Binding="{Binding Color}" Width="80"/>
+                                <DataGridTextColumn Header="Gender" Binding="{Binding Gender}" Width="80"/>
+                                <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat={}{0:C2}}" Width="90"/>
+                                <DataGridTextColumn Header="Stock" Binding="{Binding StockQuantity}" Width="70"/>
 
-                                <DataGridTemplateColumn Header="Action" Width="120">
+                                <DataGridTemplateColumn Header="Action" Width="110">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Button Content="➕ Add to Cart" 
                                                     Background="#4ECDC4"
                                                     Foreground="White"
-                                                    FontSize="11"
+                                                    FontSize="10"
                                                     FontWeight="Bold"
-                                                    Padding="10,5"
+                                                    Padding="8,5"
                                                     BorderThickness="0"
                                                     Cursor="Hand"
                                                     Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Page}}"
@@ -187,19 +187,18 @@
                                   GridLinesVisibility="Horizontal"
                                   RowHeight="50"
                                   Background="White"
-                                  MinWidth="700">
+                                  MinWidth="650">
 
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="200"/>
-                                <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat={}{0:C2}}" Width="100"/>
+                                <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="220"/>
                                 <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="100"/>
 
-                                <DataGridTemplateColumn Header="Quantity" Width="120">
+                                <DataGridTemplateColumn Header="Quantity" Width="130">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                                 <Button Content="-" 
-                                                        Width="30" Height="30"
+                                                        Width="28" Height="28"
                                                         Background="#F44336"
                                                         Foreground="White"
                                                         FontWeight="Bold"
@@ -209,7 +208,7 @@
                                                         CommandParameter="{Binding}"/>
 
                                                 <TextBlock Text="{Binding Quantity}" 
-                                                           Width="40" 
+                                                           Width="35" 
                                                            TextAlignment="Center"
                                                            VerticalAlignment="Center"
                                                            FontSize="14" 
@@ -217,7 +216,7 @@
                                                            Foreground="Black"/>
 
                                                 <Button Content="+" 
-                                                        Width="30" Height="30"
+                                                        Width="28" Height="28"
                                                         Background="#4CAF50"
                                                         Foreground="White"
                                                         FontWeight="Bold"
@@ -232,7 +231,7 @@
 
                                 <DataGridTextColumn Header="Total" Binding="{Binding TotalPrice, StringFormat={}{0:C2}}" Width="100"/>
 
-                                <DataGridTemplateColumn Header="Action" Width="100">
+                                <DataGridTemplateColumn Header="Action" Width="90">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Button Content="Remove" 
@@ -240,7 +239,7 @@
                                                     Foreground="White"
                                                     FontSize="10"
                                                     FontWeight="Bold"
-                                                    Padding="8,5"
+                                                    Padding="6,5"
                                                     Cursor="Hand"
                                                     Command="{Binding DataContext.RemoveFromCartCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                     CommandParameter="{Binding}"/>
@@ -260,9 +259,14 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="TOTAL BILL:" 
-                                       FontSize="18" FontWeight="Bold" VerticalAlignment="Center"
-                                       Foreground="#333333"/>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="ORDER SUMMARY" 
+                                           FontSize="16" FontWeight="Bold" 
+                                           Foreground="#333333"/>
+                                <TextBlock Text="{Binding CustomerName, StringFormat='Customer: {0}'}" 
+                                           FontSize="12" Foreground="#666666"
+                                           Margin="0,5,0,0"/>
+                            </StackPanel>
 
                             <TextBlock Grid.Column="1" Text="{Binding TotalBill, StringFormat={}{0:C2}}" 
                                        FontSize="24" FontWeight="Bold" Foreground="#4CAF50"
@@ -304,16 +308,16 @@
                                   GridLinesVisibility="Horizontal"
                                   RowHeight="50"
                                   Background="White"
-                                  MinWidth="800">
+                                  MinWidth="750">
 
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Order ID" Binding="{Binding OrderId}" Width="80"/>
-                                <DataGridTextColumn Header="Date" Binding="{Binding OrderDate, StringFormat='MMM dd, yyyy hh:mm tt'}" Width="180"/>
-                                <DataGridTextColumn Header="Total Amount" Binding="{Binding TotalAmount, StringFormat={}{0:C2}}" Width="120"/>
-                                <DataGridTextColumn Header="Status" Binding="{Binding OrderStatus}" Width="100"/>
-                                <DataGridTextColumn Header="Items" Binding="{Binding OrderItems.Count}" Width="80"/>
+                                <DataGridTextColumn Header="Date" Binding="{Binding OrderDate, StringFormat='MMM dd, yyyy hh:mm tt'}" Width="170"/>
+                                <DataGridTextColumn Header="Total Amount" Binding="{Binding TotalAmount, StringFormat={}{0:C2}}" Width="110"/>
+                                <DataGridTextColumn Header="Status" Binding="{Binding OrderStatus}" Width="90"/>
+                                <DataGridTextColumn Header="Items" Binding="{Binding OrderItems.Count}" Width="60"/>
 
-                                <DataGridTemplateColumn Header="Actions" Width="160">
+                                <DataGridTemplateColumn Header="Actions" Width="150">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -322,7 +326,7 @@
                                                         Foreground="White"
                                                         FontSize="10"
                                                         FontWeight="Bold"
-                                                        Padding="8,5"
+                                                        Padding="6,5"
                                                         Margin="2"
                                                         Cursor="Hand"
                                                         Command="{Binding DataContext.ViewOrderDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
@@ -333,7 +337,7 @@
                                                         Foreground="White"
                                                         FontSize="10"
                                                         FontWeight="Bold"
-                                                        Padding="8,5"
+                                                        Padding="6,5"
                                                         Margin="2"
                                                         Cursor="Hand"
                                                         Command="{Binding DataContext.ViewPDFCommand, RelativeSource={RelativeSource AncestorType=Page}}"

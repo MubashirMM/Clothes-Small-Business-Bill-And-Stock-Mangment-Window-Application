@@ -280,7 +280,7 @@ namespace WpfApp2.ViewModel
                    Regex.IsMatch(password, "[A-Z]") &&
                    Regex.IsMatch(password, "[a-z]") &&
                    Regex.IsMatch(password, "[0-9]") &&
-                   Regex.IsMatch(password, @"[\W_]");
+                   Regex.IsMatch(password, @"[\W_]"); 
         }
 
         private void BackToHome()
